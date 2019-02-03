@@ -11,7 +11,7 @@ part(){
        cat "$1$2" | yq --argjson pipeline "$(cat $1$3 | yq .)" \
        --arg uuid "$( cat "$1$2" | yq -r  '.title' | tr '[:upper:]' '[:lower:]' | sed -e 's/ /-/g')" \
        --arg created "$(date -d @"$(git log --format=%at $1$2 | tail -1)" +%FT%T.000Z)" \
-       '{"id":$uuid,"title":.title,"source":.source,"description":.description,"category":.category,"handle":$uuid,"create":$created,"author":.maintainer[0].name,"view_count":"0","usage_sample":[{"content":$pipeline},{"variable":.envs}]}'> /tmp/result.json
+       '{"id":$uuid,"title":.title,"source":.source,"description":.description,"category":.category,"handle":$uuid,"create":$created,"author":.maintainer[0].name,"view_count":"0","usage_sample":[{"content":$pipeline,"variable":.envs}]}'> /tmp/result.json
        cat '/tmp/step.json' | jq -r --argjson pipeline "$(cat '/tmp/result.json' | jq .)" '. +=  [$pipeline]' > /tmp/step.json
       }
 
