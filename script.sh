@@ -82,7 +82,7 @@ if [ "$result" == "fail" ]; then
 echo -e "${RED}-----------------------------------------"
 echo -e "Please correct found problems and restart"
 echo -e "-----------------------------------------${NC}"
-exit 1
+#exit 1
 fi
 
 
@@ -94,9 +94,10 @@ for d in ${BASE_DIR}/plugins/*/; do
   #echo "$pipeline"
   plugin=$(basename $d/plugin.y*)
   #echo "$plugin"
-    if [ -f "$d/$pipeline" ] && [ -f "$d/$plugin" ]; then
+    if [ -f "$d/$pipeline" ] && [ -f "$d/$plugin" ] && [ -f "$d/README.md" ]; then
       part $d $plugin $pipeline
       logo_download $d $plugin
+      echo -e "Plugin configuration ${GREEN}Created${NC}"
     fi
   pipeline=''
   plugin=''
@@ -104,8 +105,16 @@ done
 
 #replace keys with ids
 #cat /tmp/step.json
+if [ -f $BASE_DIR/plugins/categories.yaml ]; then
+cat $BASE_DIR/plugins/categories.yaml | yq '.' > $BASE_DIR/category.json
+echo "Replacing categories with IDs"
 replace_keys_with_ids /tmp/step.json $BASE_DIR/category.json
-
 #copy step.json to a base dir
 cp /tmp/step.json $BASE_DIR/step.json
 #cat $BASE_DIR/step.json
+echo -e "${GREEN}Done${NC}"
+else
+echo -e "categories.yaml file ${RED}not found${NC}"
+echo -e "${RED}Place categories.yaml file into plugins directory and restart${NC}"
+exit 1
+fi
